@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créateur de groupe - COP CVL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1a1a1a; /* Fond sombre */
+            color: #fff; /* Texte blanc */
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #333; /* Fond du header */
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff; /* Texte blanc */
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #333; /* Fond du panneau initial */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre légère */
+            margin-top: 60px; /* Décaler le panneau initial en dessous du header */
+        }
+        #result {
+            margin-top: 20px;
+            background-color: #444; /* Fond du tableau */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre légère */
+        }
+        button {
+            background-color: #333; /* Fond du bouton */
+            color: #fff; /* Texte blanc */
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #555; /* Fond du bouton au survol */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #666; /* Fond de la zone de texte */
+        }
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            color: #fff; /* Texte blanc */
+        }
+        table th {
+            background-color: #333; /* Fond des en-têtes de colonne */
+        }
+        .reset-btn {
+            margin-top: 20px;
+            float: right; /* Aligner le bouton à droite */
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Créateur de groupe - COP CVL</h1>
+</header>
+<div class="container">
+    <h2>Entrez le nombre d'élèves :</h2>
+    <input type="number" id="numStudents" placeholder="Nombre d'élèves (≥ 34)">
+    <button onclick="calculateGroups()">Calculer</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    function calculateGroups() {
+        var numStudents = parseInt(document.getElementById("numStudents").value);
+
+        // Vérification que le nombre d'élèves est supérieur ou égal à 34
+        if (numStudents < 34 || isNaN(numStudents)) {
+            alert("Le nombre d'élèves doit être supérieur ou égal à 34.");
+            return;
+        }
+
+        // Division de l'input par 3/4 et ajout de 1 pour rendre la valeur divisible par 2
+        var nationsStudents = Math.floor((numStudents * 3 / 5) + 1);
+
+        // Assurer que les nombres pour les pays soient divisibles par 2
+        nationsStudents += nationsStudents % 2;
+
+        // Division par 12 pour chaque pays
+        nationsStudents = Math.floor(nationsStudents / 12);
+        if (nationsStudents % 2 !== 0) {
+            nationsStudents++; // Si la division n'est pas paire, ajoute 1 pour la rendre paire
+        }
+
+        var journalistes = numStudents - ((nationsStudents * 12) + 10);
+        var otherStudent = 2;
+
+        // Si le nombre de journalistes est supérieur à 10, répartir la différence entre autres groupes
+        while (journalistes > 10) {
+            var difference = journalistes - 10;
+            if (difference > 3) {
+                difference = Math.floor(difference / 3);
+            }
+            otherStudent += difference;
+            journalistes = numStudents - ((nationsStudents * 12) + (otherStudent * 5));
+            if (journalistes < 10) {
+                break;
+            }
+        }
+
+        // Si otherStudent est supérieur à 4, transférer la différence à journalistes
+        if (otherStudent > 4) {
+            var differenceToTransfer = otherStudent - 4;
+            otherStudent = 4;
+            journalistes += differenceToTransfer;
+        }
+
+        // Définition des nombres d'élèves pour les groupes
+        var groups = {
+            "Brésil": nationsStudents, "Chili": nationsStudents,
+            "Mexique": nationsStudents, "Maurice": nationsStudents,
+            "Etats-Unis": nationsStudents , "Chine": nationsStudents,
+            "Russie": nationsStudents,"Vanuatu": nationsStudents, "France": nationsStudents,
+            "Sénégal": nationsStudents, "Emirats Arabes Unis": nationsStudents,
+            "Haïti": nationsStudents, "GIEC": otherStudent, "Banque Mondiale": otherStudent,
+            "BlackRock": otherStudent, "Total Energie": otherStudent, "Green Peace": otherStudent,
+            "journaliste": journalistes
+        };
+
+        // Affichage des résultats
+        var resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "<h2>Résultats de la répartition :</h2>";
+        var table = "<table><tr><th>Groupe</th><th>Nombre d'élèves</th></tr>";
+        for (var group in groups) {
+            table += "<tr><td>" + group + "</td><td>" + groups[group] + "</td></tr>";
+        }
+        table += "</table>";
+        resultDiv.innerHTML += table;
+
+        // Affichage du bouton Réinitialiser
+        var resetBtn = document.createElement("button");
+        resetBtn.className = "reset-btn";
+        resetBtn.textContent = "Réinitialiser";
+        resetBtn.onclick = function() {
+            location.reload();
+        };
+        resultDiv.appendChild(resetBtn);
+    }
+</script>
+</body>
+</html>
